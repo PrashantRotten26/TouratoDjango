@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'taggit',
     'rest_framework',
     'rest_framework_gis',
+    'account',
     'location',
     'pins',
     'direction',
@@ -86,7 +87,7 @@ WSGI_APPLICATION = 'unfotour.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "django.contrib.gis.db.backends.postgis",
-        "NAME": "unfo_db",          # ✅ MUST match
+        "NAME": "unfo_db",          
         "USER": "postgres",
         "PASSWORD": "1234",
         "HOST": "127.0.0.1",
@@ -163,5 +164,28 @@ LEAFLET_CONFIG = {
         "doubleClickZoom": False,
         "dragging": True,
     },
+}
+
+UNFOLD = {
+    "COLORS": {
+        "primary": {
+            "50":  "#f5f3ff",
+            "100": "#ede9fe",
+            "200": "#ddd6fe",
+            "300": "#c4b5fd",
+            "400": "#a78bfa",
+            "500": "#8b5cf6",
+            "600": "#7c3aed",
+            "700": "#6d28d9",
+            "800": "#5b21b6",
+            "900": "#4c1d95",
+        },
+        "text": {
+            "primary":   "#333333",
+            "secondary": "#4B5563",
+            "muted":     "#6B7280",
+            "disabled":  "#9CA3AF",
+        }
+    }
 }
 

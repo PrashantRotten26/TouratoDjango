@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
 from .models import (
     MainAttraction, ThingsToDo, PlacesToVisit, PlacesToEat, Market, CountryInfo,
     DestinationGuide, PlaceInformation, TravelHacks, Festivals, FamousPhotoPoint, Activities, Hotel
@@ -14,20 +15,21 @@ from .serializers import (
 
 # Model mapping dictionary
 MODEL_MAPPING = {
-    'main_attractions': (MainAttraction, MainAttractionSerializer),
-    'things_to_do': (ThingsToDo, ThingsToDoSerializer),
-    'places_to_visit': (PlacesToVisit, PlacesToVisitSerializer),
-    'places_to_eat': (PlacesToEat, PlacesToEatSerializer),
+    'things-to-do': (ThingsToDo, ThingsToDoSerializer),
+    'main-attractions': (MainAttraction, MainAttractionSerializer),
+    'places-to-visit': (PlacesToVisit, PlacesToVisitSerializer),
+    'places-to-eat': (PlacesToEat, PlacesToEatSerializer),
     'markets': (Market, MarketSerializer),
-    'country_info': (CountryInfo, CountryInfoSerializer),
-    'destination_guides': (DestinationGuide, DestinationGuideSerializer),
-    'place_information': (PlaceInformation, PlaceInformationSerializer),
-    'travel_hacks': (TravelHacks, TravelHacksSerializer),
+    'country-info': (CountryInfo, CountryInfoSerializer),
+    'destination-guides': (DestinationGuide, DestinationGuideSerializer),
+    'place-information': (PlaceInformation, PlaceInformationSerializer),
+    'travel-hacks': (TravelHacks, TravelHacksSerializer),
     'festivals': (Festivals, FestivalsSerializer),
-    'famous_photo_points': (FamousPhotoPoint, FamousPhotoPointSerializer),
+    'famous-photo-points': (FamousPhotoPoint, FamousPhotoPointSerializer),
     'activities': (Activities, ActivitiesSerializer),
     'hotels': (Hotel, HotelSerializer),
 }
+
 
 
 @api_view(['GET'])
@@ -96,4 +98,44 @@ def get_pins_by_type(request, table_name):
         'pins': serialized_data,
         'total_count': len(serialized_data),
         'table_name': table_name
+    })
+
+
+
+@api_view(['GET'])
+def get_pin_by_slug(request, slug):
+    """
+    Fetch a single pin using its slug.
+    Example slug: things-to-do-red-fort-323cd
+    """
+
+    model_class = None
+    serializer_class = None
+    table_key = None
+
+    # 🔥 SAFE prefix matching
+    for key, (model, serializer) in MODEL_MAPPING.items():
+        if slug.startswith(key + "-"):
+            table_key = key
+            model_class = model
+            serializer_class = serializer
+            break
+
+    if not model_class:
+        return Response(
+            {"error": "Invalid slug or unsupported pin type"},
+            status=400
+        )
+
+    pin = get_object_or_404(
+        model_class,
+        slug=slug,
+        published=True
+    )
+
+    serializer = serializer_class(pin)
+
+    return Response({
+        "pin": serializer.data,
+        "type": table_key
     })

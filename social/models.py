@@ -8,7 +8,7 @@ class PostPlatform(models.Model):
     Social media / content platforms (YouTube, Instagram, Website, Blog, etc.)
     """
     name = models.CharField(max_length=100, unique=True)
-    code = models.CharField(max_length=20, unique=True)  # short code like YT, IG
+    code = models.CharField(max_length=20, unique=True)  # short code like YT, IG 
     website = models.URLField(blank=True)
     active = models.BooleanField(default=True)
 
@@ -20,6 +20,8 @@ class PostPlatform(models.Model):
     
     def __str__(self):
         return self.name
+
+
 
 class SocialPost(models.Model):
     """Model for social media posts linked to locations and attractions."""
