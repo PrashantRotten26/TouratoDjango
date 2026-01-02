@@ -5,6 +5,11 @@ from django.db.models import F
 from django.contrib.gis.db import models as gis_models
 from taggit.managers import TaggableManager
 from location.models import City
+from django.core.validators import MinValueValidator, MaxValueValidator
+from django.contrib.auth.models import User
+
+
+
  
 class MainAttraction(models.Model):
     """Model for main tourist attractions in a city."""
@@ -17,13 +22,18 @@ class MainAttraction(models.Model):
     )
  
     pin = gis_models.PointField(
-        geography=True,
         srid=4326
     )
- 
+    created_by = models.ForeignKey(
+    User,
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True
+    )
+
     slug = models.SlugField(
         max_length=255,
-        blank=True,   # ✅ REQUIRED (form validation)
+        blank=True,   
         help_text="URL-friendly identifier"
     )
  
@@ -42,11 +52,15 @@ class MainAttraction(models.Model):
     link = models.URLField(blank=True, null=True)
  
     rating = models.DecimalField(
-        max_digits=4,
-        decimal_places=2,
-        null=True,
-        blank=True,
-        help_text="Rating out of 5"
+    max_digits=4,
+    decimal_places=2,
+    null=True,
+    blank=True,
+    validators=[
+        MinValueValidator(0),
+        MaxValueValidator(5)
+    ],
+    help_text="Rating out of 5"
     )
  
     class Meta:
@@ -58,13 +72,18 @@ class MainAttraction(models.Model):
                 name="unique_attraction_slug_per_city"
             )
         ]
- 
+
+
+
     def save(self, *args, **kwargs):
-        if not self.slug:
+        # Generate slug ONLY on object creation
+        if not self.pk:
             base_slug = slugify(self.name)[:200]
             random_suffix = uuid.uuid4().hex[:5]
-            self.slug = f"main-attraction-{base_slug}-{random_suffix}"
+            self.slug = f"mainattraction-{base_slug}-{random_suffix}"
+
         super().save(*args, **kwargs)
+
  
     def __str__(self):
         return f"{self.name} ({self.city.name})"
@@ -72,7 +91,7 @@ class MainAttraction(models.Model):
  
 class ThingsToDo(models.Model):
     """Model for activities or things to do in a city."""
- 
+    
     name = models.CharField(max_length=255)
  
     city = models.ForeignKey(
@@ -81,10 +100,15 @@ class ThingsToDo(models.Model):
     )
  
     pin = gis_models.PointField(
-        geography=True,
         srid=4326
     )
- 
+    created_by = models.ForeignKey(
+    User,
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True
+    )
+
     slug = models.SlugField(
         max_length=255,
         blank=True
@@ -105,11 +129,15 @@ class ThingsToDo(models.Model):
     link = models.URLField(blank=True, null=True)
  
     rating = models.DecimalField(
-        max_digits=4,
-        decimal_places=2,
-        null=True,
-        blank=True,
-        help_text="Rating out of 5"
+    max_digits=4,
+    decimal_places=2,
+    null=True,
+    blank=True,
+    validators=[
+        MinValueValidator(0),
+        MaxValueValidator(5)
+    ],
+    help_text="Rating out of 5"
     )
  
     class Meta:
@@ -123,10 +151,10 @@ class ThingsToDo(models.Model):
         ]
  
     def save(self, *args, **kwargs):
-        if not self.slug:
+        if not self.pk:
             base_slug = slugify(self.name)[:200]
             random_suffix = uuid.uuid4().hex[:5]
-            self.slug = f"things-to-do-{base_slug}-{random_suffix}"
+            self.slug = f"thingstodo-{base_slug}-{random_suffix}"
         super().save(*args, **kwargs)
  
     def __str__(self):
@@ -145,10 +173,15 @@ class PlacesToVisit(models.Model):
     )
  
     pin = gis_models.PointField(
-        geography=True,
         srid=4326
     )
- 
+    created_by = models.ForeignKey(
+    User,
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True
+    )
+
     slug = models.SlugField(
         max_length=255,
         blank=True
@@ -169,11 +202,15 @@ class PlacesToVisit(models.Model):
     link = models.URLField(blank=True, null=True)
  
     rating = models.DecimalField(
-        max_digits=4,
-        decimal_places=2,
-        null=True,
-        blank=True,
-        help_text="Rating out of 5"
+    max_digits=4,
+    decimal_places=2,
+    null=True,
+    blank=True,
+    validators=[
+        MinValueValidator(0),
+        MaxValueValidator(5)
+    ],
+    help_text="Rating out of 5"
     )
  
     class Meta:
@@ -187,10 +224,10 @@ class PlacesToVisit(models.Model):
         ]
  
     def save(self, *args, **kwargs):
-        if not self.slug:
+        if not self.pk:
             base_slug = slugify(self.name)[:200]
             random_suffix = uuid.uuid4().hex[:5]
-            self.slug = f"places-to-visit-{base_slug}-{random_suffix}"
+            self.slug = f"placestovisit-{base_slug}-{random_suffix}"
         super().save(*args, **kwargs)
  
     def __str__(self):
@@ -210,10 +247,15 @@ class PlacesToEat(models.Model):
     )
  
     pin = gis_models.PointField(
-        geography=True,
         srid=4326
     )
- 
+    created_by = models.ForeignKey(
+    User,
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True
+    )
+
     slug = models.SlugField(
         max_length=255,
         blank=True
@@ -234,11 +276,15 @@ class PlacesToEat(models.Model):
     link = models.URLField(blank=True, null=True)
  
     rating = models.DecimalField(
-        max_digits=4,
-        decimal_places=2,
-        null=True,
-        blank=True,
-        help_text="Rating out of 5"
+    max_digits=4,
+    decimal_places=2,
+    null=True,
+    blank=True,
+    validators=[
+        MinValueValidator(0),
+        MaxValueValidator(5)
+    ],
+    help_text="Rating out of 5"
     )
  
     class Meta:
@@ -252,10 +298,10 @@ class PlacesToEat(models.Model):
         ]
  
     def save(self, *args, **kwargs):
-        if not self.slug:
+        if not self.pk:
             base_slug = slugify(self.name)[:200]
             random_suffix = uuid.uuid4().hex[:5]
-            self.slug = f"places-to-eat-{base_slug}-{random_suffix}"
+            self.slug = f"placestoeat-{base_slug}-{random_suffix}"
         super().save(*args, **kwargs)
  
     def __str__(self):
@@ -273,10 +319,15 @@ class Market(models.Model):
     )
  
     pin = gis_models.PointField(
-        geography=True,
         srid=4326
     )
- 
+    created_by = models.ForeignKey(
+    User,
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True
+    )
+
     slug = models.SlugField(
         max_length=255,
         blank=True
@@ -297,11 +348,15 @@ class Market(models.Model):
     link = models.URLField(blank=True, null=True)
  
     rating = models.DecimalField(
-        max_digits=4,
-        decimal_places=2,
-        null=True,
-        blank=True,
-        help_text="Rating out of 5"
+    max_digits=4,
+    decimal_places=2,
+    null=True,
+    blank=True,
+    validators=[
+        MinValueValidator(0),
+        MaxValueValidator(5)
+    ],
+    help_text="Rating out of 5"
     )
  
     class Meta:
@@ -315,7 +370,7 @@ class Market(models.Model):
         ]
  
     def save(self, *args, **kwargs):
-        if not self.slug:
+        if not self.pk:
             base_slug = slugify(self.name)[:200]
             random_suffix = uuid.uuid4().hex[:5]
             self.slug = f"market-{base_slug}-{random_suffix}"
@@ -335,10 +390,15 @@ class CountryInfo(models.Model):
     )
  
     pin = gis_models.PointField(
-        geography=True,
         srid=4326
     )
- 
+    created_by = models.ForeignKey(
+    User,
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True
+    )
+
     slug = models.SlugField(
         max_length=255,
         blank=True
@@ -359,11 +419,15 @@ class CountryInfo(models.Model):
     link = models.URLField(blank=True, null=True)
  
     rating = models.DecimalField(
-        max_digits=4,
-        decimal_places=2,
-        null=True,
-        blank=True,
-        help_text="Rating out of 5"
+    max_digits=4,
+    decimal_places=2,
+    null=True,
+    blank=True,
+    validators=[
+        MinValueValidator(0),
+        MaxValueValidator(5)
+    ],
+    help_text="Rating out of 5"
     )
  
     class Meta:
@@ -377,10 +441,10 @@ class CountryInfo(models.Model):
         ]
  
     def save(self, *args, **kwargs):
-        if not self.slug:
+        if not self.pk:
             base_slug = slugify(self.name)[:200]
             random_suffix = uuid.uuid4().hex[:5]
-            self.slug = f"country-info-{base_slug}-{random_suffix}"
+            self.slug = f"countryinfo-{base_slug}-{random_suffix}"
         super().save(*args, **kwargs)
  
     def __str__(self):
@@ -395,9 +459,14 @@ class DestinationGuide(models.Model):
         City,
         on_delete=models.CASCADE
     )
- 
+    created_by = models.ForeignKey(
+    User,
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True
+    )
+
     pin = gis_models.PointField(
-        geography=True,
         srid=4326
     )
  
@@ -421,11 +490,15 @@ class DestinationGuide(models.Model):
     link = models.URLField(blank=True, null=True)
  
     rating = models.DecimalField(
-        max_digits=4,
-        decimal_places=2,
-        null=True,
-        blank=True,
-        help_text="Rating out of 5"
+    max_digits=4,
+    decimal_places=2,
+    null=True,
+    blank=True,
+    validators=[
+        MinValueValidator(0),
+        MaxValueValidator(5)
+    ],
+    help_text="Rating out of 5"
     )
  
     class Meta:
@@ -439,10 +512,10 @@ class DestinationGuide(models.Model):
         ]
  
     def save(self, *args, **kwargs):
-        if not self.slug:
+        if not self.pk:
             base_slug = slugify(self.name)[:200]
             random_suffix = uuid.uuid4().hex[:5]
-            self.slug = f"destination-guide-{base_slug}-{random_suffix}"
+            self.slug = f"destinationguide-{base_slug}-{random_suffix}"
         super().save(*args, **kwargs)
  
     def __str__(self):
@@ -458,9 +531,14 @@ class PlaceInformation(models.Model):
         City,
         on_delete=models.CASCADE
     )
- 
+    created_by = models.ForeignKey(
+    User,
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True
+    )
+
     pin = gis_models.PointField(
-        geography=True,
         srid=4326
     )
  
@@ -484,11 +562,15 @@ class PlaceInformation(models.Model):
     link = models.URLField(blank=True, null=True)
  
     rating = models.DecimalField(
-        max_digits=4,
-        decimal_places=2,
-        null=True,
-        blank=True,
-        help_text="Rating out of 5"
+    max_digits=4,
+    decimal_places=2,
+    null=True,
+    blank=True,
+    validators=[
+        MinValueValidator(0),
+        MaxValueValidator(5)
+    ],
+    help_text="Rating out of 5"
     )
  
     class Meta:
@@ -502,10 +584,10 @@ class PlaceInformation(models.Model):
         ]
  
     def save(self, *args, **kwargs):
-        if not self.slug:
+        if not self.pk:
             base_slug = slugify(self.name)[:200]
             random_suffix = uuid.uuid4().hex[:5]
-            self.slug = f"place-information-{base_slug}-{random_suffix}"
+            self.slug = f"placeinformation-{base_slug}-{random_suffix}"
         super().save(*args, **kwargs)
  
     def __str__(self):
@@ -525,10 +607,15 @@ class TravelHacks(models.Model):
     )
  
     pin = gis_models.PointField(
-        geography=True,
         srid=4326
     )
- 
+    created_by = models.ForeignKey(
+    User,
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True
+    )
+
     slug = models.SlugField(
         max_length=255,
         blank=True
@@ -549,11 +636,15 @@ class TravelHacks(models.Model):
     link = models.URLField(blank=True, null=True)
  
     rating = models.DecimalField(
-        max_digits=4,
-        decimal_places=2,
-        null=True,
-        blank=True,
-        help_text="Rating out of 5"
+    max_digits=4,
+    decimal_places=2,
+    null=True,
+    blank=True,
+    validators=[
+        MinValueValidator(0),
+        MaxValueValidator(5)
+    ],
+    help_text="Rating out of 5"
     )
  
     class Meta:
@@ -567,10 +658,10 @@ class TravelHacks(models.Model):
         ]
  
     def save(self, *args, **kwargs):
-        if not self.slug:
+        if not self.pk:
             base_slug = slugify(self.name)[:200]
             random_suffix = uuid.uuid4().hex[:5]
-            self.slug = f"travel-hacks-{base_slug}-{random_suffix}"
+            self.slug = f"travelhacks-{base_slug}-{random_suffix}"
         super().save(*args, **kwargs)
  
     def __str__(self):
@@ -589,10 +680,15 @@ class Festivals(models.Model):
     )
  
     pin = gis_models.PointField(
-        geography=True,
         srid=4326
     )
- 
+    created_by = models.ForeignKey(
+    User,
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True
+    )
+
     slug = models.SlugField(
         max_length=255,
         blank=True
@@ -613,11 +709,15 @@ class Festivals(models.Model):
     link = models.URLField(blank=True, null=True)
  
     rating = models.DecimalField(
-        max_digits=4,
-        decimal_places=2,
-        null=True,
-        blank=True,
-        help_text="Rating out of 5"
+    max_digits=4,
+    decimal_places=2,
+    null=True,
+    blank=True,
+    validators=[
+        MinValueValidator(0),
+        MaxValueValidator(5)
+    ],
+    help_text="Rating out of 5"
     )
  
     class Meta:
@@ -631,7 +731,7 @@ class Festivals(models.Model):
         ]
  
     def save(self, *args, **kwargs):
-        if not self.slug:
+        if not self.pk:
             base_slug = slugify(self.name)[:200]
             random_suffix = uuid.uuid4().hex[:5]
             self.slug = f"festivals-{base_slug}-{random_suffix}"
@@ -653,10 +753,15 @@ class FamousPhotoPoint(models.Model):
     )
  
     pin = gis_models.PointField(
-        geography=True,
         srid=4326
     )
- 
+    created_by = models.ForeignKey(
+    User,
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True
+    )
+
     slug = models.SlugField(
         max_length=255,
         blank=True
@@ -677,11 +782,15 @@ class FamousPhotoPoint(models.Model):
     link = models.URLField(blank=True, null=True)
  
     rating = models.DecimalField(
-        max_digits=4,
-        decimal_places=2,
-        null=True,
-        blank=True,
-        help_text="Rating out of 5"
+    max_digits=4,
+    decimal_places=2,
+    null=True,
+    blank=True,
+    validators=[
+        MinValueValidator(0),
+        MaxValueValidator(5)
+    ],
+    help_text="Rating out of 5"
     )
  
     class Meta:
@@ -695,10 +804,10 @@ class FamousPhotoPoint(models.Model):
         ]
  
     def save(self, *args, **kwargs):
-        if not self.slug:
+        if not self.pk:
             base_slug = slugify(self.name)[:200]
             random_suffix = uuid.uuid4().hex[:5]
-            self.slug = f"famous-photo-point-{base_slug}-{random_suffix}"
+            self.slug = f"famousphotopoint-{base_slug}-{random_suffix}"
         super().save(*args, **kwargs)
  
     def __str__(self):
@@ -717,10 +826,15 @@ class Activities(models.Model):
     )
  
     pin = gis_models.PointField(
-        geography=True,
         srid=4326
     )
- 
+    created_by = models.ForeignKey(
+    User,
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True
+    )
+
     slug = models.SlugField(
         max_length=255,
         blank=True
@@ -741,11 +855,15 @@ class Activities(models.Model):
     link = models.URLField(blank=True, null=True)
  
     rating = models.DecimalField(
-        max_digits=4,
-        decimal_places=2,
-        null=True,
-        blank=True,
-        help_text="Rating out of 5"
+    max_digits=4,
+    decimal_places=2,
+    null=True,
+    blank=True,
+    validators=[
+        MinValueValidator(0),
+        MaxValueValidator(5)
+    ],
+    help_text="Rating out of 5"
     )
  
     class Meta:
@@ -759,7 +877,7 @@ class Activities(models.Model):
         ]
  
     def save(self, *args, **kwargs):
-        if not self.slug:
+        if not self.pk:
             base_slug = slugify(self.name)[:200]
             random_suffix = uuid.uuid4().hex[:5]
             self.slug = f"activities-{base_slug}-{random_suffix}"
@@ -794,10 +912,15 @@ class Hotel(models.Model):
     )
  
     pin = gis_models.PointField(
-        geography=True,
         srid=4326
     )
- 
+    created_by = models.ForeignKey(
+    User,
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True
+    )
+
     slug = models.SlugField(
         max_length=255,
         blank=True   # ✅ REQUIRED (admin + auto slug)
@@ -820,11 +943,15 @@ class Hotel(models.Model):
     )
  
     rating = models.DecimalField(
-        max_digits=4,
-        decimal_places=2,
-        null=True,
-        blank=True,
-        help_text="Rating out of 5"
+    max_digits=4,
+    decimal_places=2,
+    null=True,
+    blank=True,
+    validators=[
+        MinValueValidator(0),
+        MaxValueValidator(5)
+    ],
+    help_text="Rating out of 5"
     )
     link = models.URLField(blank=True, null=True)
     published = models.BooleanField(default=False)
@@ -840,7 +967,7 @@ class Hotel(models.Model):
         ]
  
     def save(self, *args, **kwargs):
-        if not self.slug:
+        if not self.pk:
             base_slug = slugify(self.name)[:200]
             random_suffix = uuid.uuid4().hex[:5]
             self.slug = f"hotel-{base_slug}-{random_suffix}"

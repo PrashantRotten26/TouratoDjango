@@ -44,3 +44,4 @@ admin.site.register(Country, CountryAdmin)
 admin.site.register(State, StateAdmin)
 admin.site.register(City, CityAdmin)
 admin.site.register(Specialzone, SpecialzoneAdmin)
+  

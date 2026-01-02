@@ -25,7 +25,7 @@ class State(models.Model):
         related_name="states"
     )
     name = models.CharField(max_length=255)
-    geometry = models.MultiPolygonField(srid=4326)
+    geometry = models.MultiPolygonField(srid=4326,blank=True, null=True)
  
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -48,7 +48,7 @@ class State(models.Model):
 class City(models.Model):
     state = models.ForeignKey(State, on_delete=models.CASCADE, related_name="cities")
     name = models.CharField(max_length=255)
-    geometry = models.GeometryField(srid=4326)
+    geometry = models.GeometryField(srid=4326, blank=True, null=True)
  
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)

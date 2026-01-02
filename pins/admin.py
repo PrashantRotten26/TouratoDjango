@@ -7,7 +7,7 @@ from pins.models import MainAttraction ,ThingsToDo,PlacesToVisit,PlacesToEat,Mar
 
 class UnfoldLeafletMixin(ModelAdmin, LeafletGeoAdmin):
     exclude = ("slug",)
-
+    search_fields = ("name",)
     class Media:
         css = {
             "all": (
