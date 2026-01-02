@@ -11,6 +11,12 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+print("DB NAME:", os.getenv("DB_NAME"))
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,12 +31,45 @@ SECRET_KEY = 'django-insecure-yis7*(8twjzhke76g!g#&l4ck_z5sv@wmekm9$w1-tbnkn$4j@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
+
+# CORS Configuration
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+# CSRF trusted origins for ngrok
+CSRF_TRUSTED_ORIGINS = [
+    'https://purposive-zechariah-noncompressively.ngrok-free.dev',
+]
+
+# REST Framework Configuration
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ],
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+    ],
+}
+
+
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',
     'django.contrib.gis',
     'unfold',
     'django.contrib.admin',
@@ -43,6 +82,7 @@ INSTALLED_APPS = [
     'taggit',
     'rest_framework',
     'rest_framework_gis',
+    'account',
     'location',
     'pins',
     'direction',
@@ -51,6 +91,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -85,14 +126,15 @@ WSGI_APPLICATION = 'unfotour.wsgi.application'
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.contrib.gis.db.backends.postgis",
-        "NAME": "unfo_db",          # ✅ MUST match
-        "USER": "postgres",
-        "PASSWORD": "1234",
-        "HOST": "127.0.0.1",
-        "PORT": "5432",
+        "ENGINE": os.getenv("DB_ENGINE"),
+        "NAME": os.getenv("DB_NAME"),
+        "USER": os.getenv("DB_USER"),
+        "PASSWORD": os.getenv("DB_PASSWORD"),
+        "HOST": os.getenv("DB_HOST"),
+        "PORT": os.getenv("DB_PORT"),
     }
 }
+
 
 
 
@@ -158,10 +200,33 @@ LEAFLET_CONFIG = {
     ],
 
     "MAP_OPTIONS": {
-        "zoomControl": False,
-        "scrollWheelZoom": False,
-        "doubleClickZoom": False,
+        "zoomControl": True,
+        "scrollWheelZoom": True,
+        "doubleClickZoom": True,
         "dragging": True,
     },
+}
+
+UNFOLD = {
+    "COLORS": {
+        "primary": {
+            "50":  "#f5f3ff",
+            "100": "#ede9fe",
+            "200": "#ddd6fe",
+            "300": "#c4b5fd",
+            "400": "#a78bfa",
+            "500": "#8b5cf6",
+            "600": "#7c3aed",
+            "700": "#6d28d9",
+            "800": "#5b21b6",
+            "900": "#4c1d95",
+        },
+        "text": {
+            "primary":   "#333333",
+            "secondary": "#4B5563",
+            "muted":     "#6B7280",
+            "disabled":  "#9CA3AF",
+        }
+    }
 }
 

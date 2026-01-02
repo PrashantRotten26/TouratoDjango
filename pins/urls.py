@@ -1,7 +1,11 @@
 from django.urls import path
-from .views import all_pins, get_pins_by_type
+from .views import search_pins, get_pin_by_slug, geocode_nominatim_proxy
 
 urlpatterns = [
-    path('api/all/', all_pins, name='all_pins'),
-    path('api/pins/<str:table_name>/', get_pins_by_type, name='pins_by_type'),
+    path('api/search/', search_pins, name='search_pins'),
+    path('api/pin/<slug:slug>/', get_pin_by_slug, name='pin_by_slug'),
+    # Proxy for Nominatim geocoding to avoid browser CORS issues
+    path('geocode/nominatim/', geocode_nominatim_proxy, name='geocode_nominatim_root'),
+    path('geocode/nominatim/<path:subpath>', geocode_nominatim_proxy, name='geocode_nominatim'),
 ]
+
