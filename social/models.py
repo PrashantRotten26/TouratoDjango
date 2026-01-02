@@ -42,6 +42,8 @@ class SocialPost(models.Model):
 
     tags = TaggableManager(blank=True)
 
+    language = models.CharField(max_length=50, blank=True,null=True)
+
     published = models.BooleanField(default=False)
 
     country = models.ForeignKey(Country, on_delete=models.CASCADE, blank=True, null=True)
